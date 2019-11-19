@@ -1,0 +1,170 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled9.ipynb",
+      "provenance": [],
+      "private_outputs": true,
+      "collapsed_sections": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/hajerhajjajifahem24/parse-server-codecraft/blob/master/%20Price%20Prediction%20with%20ML%20in%20Python%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "X-BzvSCQfTD-",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "!pip install TFANN\n",
+        "#installer lib TFANN "
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lXREUEczeGKZ",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import numpy as np\n",
+        "\n",
+        "import matplotlib.pyplot as mpl\n",
+        "from sklearn.preprocessing import scale\n",
+        "from TFANN import ANNR\n",
+        "from google.colab import files\n",
+        "import tensorflow as tf\n",
+        "import tensorflow.compat.v1 as tf\n",
+        "#### importation lib "
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ATvLzEwMfh9L",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "from google.colab import files\n",
+        "files.upload()"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lYWiRVRC3qUU",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "!ls\n",
+        "#verfication de importation de fichier "
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "gwN8S9iW4pL6",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#reads data from the file and ceates a matrix with only the dates and the prices\n",
+        "# kecture de données from the fichiier et creation matrice avec data et prices  \n",
+        "stock_data = np.loadtxt('ZIM.SG.csv', delimiter=\",\", skiprows=1, usecols=(1, 4))\n",
+        "\n",
+        "stock_data=scale(stock_data)\n",
+        "#recuperation les iinformation price\n",
+        "prices = stock_data[:, 1].reshape(-1, 1)\n",
+        "dates = stock_data[:, 0].reshape(-1, 1)\n",
+        "#affichage des données sous la frome d'un graphic \n",
+        "mpl.plot(dates[:, 0], prices[:, 0])\n",
+        "mpl.show()"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "PWPInbJL4i2x",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#creation NN avec lib FANN fast artificiakl NN \n",
+        "input = 1\n",
+        "output = 1\n",
+        "hidden = 50\n",
+        "#  creation layers\n",
+        "layers = [('F', hidden), ('AF', 'tanh'), ('F', hidden), ('AF', 'tanh'), ('F', hidden), ('AF', 'tanh'), ('F', output)]\n",
+        "#construire le modele \n",
+        "mlpr = ANNR([input], layers, batchSize = 256, maxIter = 20000, tol = 0.2, reg = 1e-4, verbose = True)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "rC_gbGScCeh3",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#nomber les jours totale  without the weekend\n",
+        "holdDays = 5\n",
+        "totalDays = len(dates)\n",
+        "#\n",
+        "mlpr.fit(dates[0:(totalDays-holdDays)], prices[0:(totalDays-holdDays)])"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "6sRkEQl8QQxG",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#Predictioon \n",
+        "pricePredict = mlpr.predict(dates)\n",
+        "#a\n",
+        "mpl.plot(dates, prices)\n",
+        "mpl.plot(dates, pricePredict, c='red')\n",
+        "mpl.show()"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
